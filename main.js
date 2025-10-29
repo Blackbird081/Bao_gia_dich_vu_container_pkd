@@ -1,49 +1,76 @@
 // File chính - Điểm khởi đầu của ứng dụng
 
+// [SỬA LỖI] Thêm lại 2 dòng import quan trọng đã bị xóa nhầm
+import { i18n } from './config.js';
+import { state } from './state.js';
+
 import { elements } from './dom.js';
-import { showToast, showModal } from './utils.js';
+import { showToast, showModal, hideModal } from './utils.js';
 import { loadProducts, saveQuotation, backupData } from './storage.js';
 import { translateUI, createTableRow, recalculateTotals, resetForm, renderProductManagementTable, renderHistoryTable, resetProductForm } from './ui.js';
 import { renderPreviewToCanvas, generatePdf } from './pdf.js';
-import * as handlers from './handlers.js';
+import {
+    handleLangToggle,
+    handleTableRowClick,
+    handleTableRowInput,
+    handleTableRowChange,
+    handleProductFormSubmit,
+    handleProductTableClick,
+    handleExcelExport,
+    handleExcelImport,
+    handleHistoryTableClick,
+    handleWindowClick,
+    handleRestoreData
+} from './handlers.js';
 
 function bindEvents() {
-    elements.langToggleBtn.addEventListener('click', handlers.handleLangToggle);
+    elements.langToggleBtn.addEventListener('click', handleLangToggle);
     elements.addRowBtn.addEventListener('click', createTableRow);
-    elements.tableBody.addEventListener('click', handlers.handleTableRowClick);
-    elements.tableBody.addEventListener('input', handlers.handleTableRowInput);
-    elements.tableBody.addEventListener('change', handlers.handleTableRowChange);
+    elements.tableBody.addEventListener('click', handleTableRowClick);
+    elements.tableBody.addEventListener('input', handleTableRowInput);
+    elements.tableBody.addEventListener('change', handleTableRowChange);
     elements.newBtn.addEventListener('click', () => resetForm(true));
     elements.saveBtn.addEventListener('click', saveQuotation);
     elements.renderPreviewBtn.addEventListener('click', renderPreviewToCanvas);
     elements.generatePdfBtn.addEventListener('click', generatePdf);
+
+    // --- Modal Events ---
     elements.manageProductsBtn.onclick = () => { showModal(elements.productModal); renderProductManagementTable(); };
-    elements.closeProductModalBtn.onclick = () => { handlers.hideModal(elements.productModal); resetProductForm(); };
+    elements.closeProductModalBtn.onclick = () => { hideModal(elements.productModal); resetProductForm(); };
+    elements.closeHistoryModalBtn.onclick = () => { hideModal(elements.historyModal); };
     elements.cancelEditBtn.onclick = resetProductForm;
-    elements.productForm.addEventListener('submit', handlers.handleProductFormSubmit);
-    elements.productManagementTable.addEventListener('click', handlers.handleProductTableClick);
+    elements.productForm.addEventListener('submit', handleProductFormSubmit);
+    elements.productManagementTable.addEventListener('click', handleProductTableClick);
+    
+    // --- Import/Export/Backup Events ---
     elements.importExcelBtn.onclick = () => elements.excelImporter.click();
-    elements.exportExcelBtn.addEventListener('click', handlers.handleExcelExport);
-    elements.excelImporter.addEventListener('change', handlers.handleExcelImport);
+    elements.exportExcelBtn.addEventListener('click', handleExcelExport);
+    elements.excelImporter.addEventListener('change', handleExcelImport);
     elements.backupDataBtn.addEventListener('click', backupData);
     elements.restoreDataBtn.onclick = () => elements.jsonImporter.click();
-    elements.jsonImporter.addEventListener('change', handlers.handleRestoreData);
+    elements.jsonImporter.addEventListener('change', handleRestoreData);
+
+    // --- History Events ---
     elements.historyBtn.onclick = () => { showModal(elements.historyModal); renderHistoryTable(); };
-    elements.closeHistoryModalBtn.onclick = () => { handlers.hideModal(elements.historyModal); };
-    elements.historyTableBody.addEventListener('click', handlers.handleHistoryTableClick);
-    window.addEventListener('click', handlers.handleWindowClick);
+    elements.historyTableBody.addEventListener('click', handleHistoryTableClick);
+    
+    // --- Global Events ---
+    window.addEventListener('click', handleWindowClick);
 }
 
 function init(showWelcome = true) {
     loadProducts();
     translateUI();
-    resetForm(false); // Dùng resetForm để khởi tạo form ban đầu
+    // Dùng resetForm để khởi tạo form ban đầu một cách nhất quán
+    resetForm(false); 
     if (showWelcome) {
-        showToast('Sẵn sàng tạo báo giá', 'success');
+        // Dòng này giờ sẽ hoạt động vì i18n và state đã được import
+        showToast(i18n.toastReady[state.currentLang], 'success');
     }
 }
 
 // --- APP ENTRY POINT ---
+// Sử dụng DOMContentLoaded để đảm bảo tất cả HTML đã được tải trước khi chạy script
 document.addEventListener('DOMContentLoaded', () => {
     init();
     bindEvents();
