@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Báo giá - Tân Thuận</title>
+    
+    <!-- Libraries -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="p-4 lg:p-8">
+
+    <div class="max-w-7xl mx-auto">
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h1 id="app-title" class="text-3xl font-bold text-gray-800"></h1>
+                <p id="developed-by-line" class="text-sm text-gray-500 mt-1"></p>
+            </div>
+            <div class="flex items-center">
+                <button id="manage-products-btn" class="px-4 py-2 bg-gray-700 text-white rounded-md shadow-sm hover:bg-gray-800"></button>
+                <button id="history-btn" class="ml-2 px-4 py-2 bg-yellow-600 text-white rounded-md shadow-sm hover:bg-yellow-700"></button>
+                <button id="lang-toggle-btn" class="ml-4 px-4 py-2 bg-purple-600 text-white rounded-md shadow-sm hover:bg-purple-700 font-bold">EN / VI</button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- LEFT COLUMN: CONTROLS & INPUTS -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 id="form-title" class="text-xl font-bold mb-4 border-b pb-2"></h2>
+                
+                <!-- [CẢI TIẾN] Bố cục thông tin khách hàng -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div><label id="label-quote-no" class="block text-sm font-medium text-gray-700"></label><input type="text" id="invoice-number" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm"></div>
+                    <div><label id="label-quote-date" class="block text-sm font-medium text-gray-700"></label><input type="text" id="invoice-date" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm" placeholder="Chọn ngày báo giá"></div>
+                    <div><label id="label-customer-name" class="block text-sm font-medium text-gray-700"></label><input type="text" id="customer-name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm"></div>
+                    <div><label id="label-tax-code" class="block text-sm font-medium text-gray-700"></label><input type="text" id="customer-tax-code" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm"></div>
+                    <div class="md:col-span-2"><label id="label-address" class="block text-sm font-medium text-gray-700"></label><input type="text" id="customer-address" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm"></div>
+                    <div><label id="label-phone" class="block text-sm font-medium text-gray-700"></label><input type="text" id="customer-phone" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm"></div>
+                    <div><label id="label-notes" class="block text-sm font-medium text-gray-700"></label><input type="text" id="customer-notes" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm"></div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200" id="invoice-items-table">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th id="th-service" class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
+                                <th id="th-qty" class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24"></th>
+                                <th id="th-unit-price" class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32"></th>
+                                <th id="th-amount" class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32"></th>
+                                <th class="px-2 py-2 w-10"></th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200"></tbody>
+                    </table>
+                </div>
+
+                <button id="add-row-btn" class="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700"></button>
+
+                <div class="mt-6 pt-4 border-t">
+                    <div class="flex justify-end mb-2"><span id="label-total" class="text-gray-600 font-medium w-32 text-right"></span><span id="total-amount" class="font-bold w-40 text-right">0 đ</span></div>
+                    <div class="flex justify-end text-sm"><span id="label-in-words" class="text-gray-600 font-medium w-32 text-right"></span><span id="total-in-words" class="font-medium w-auto text-right italic"></span></div>
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN: PREVIEW & ACTIONS -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 id="actions-title" class="text-xl font-bold mb-4 border-b pb-2"></h2>
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                     <button id="new-btn" class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"></button>
+                     <button id="save-btn" class="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"></button>
+                </div>
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <button id="render-preview-btn" class="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700"></button>
+                    <button id="generate-pdf-btn" class="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700"></button>
+                </div>
+                <div id="canvas-preview-container" class="bg-gray-100 p-4 rounded-md border border-gray-200 mt-4">
+                    <p id="preview-placeholder" class="text-center text-gray-500 mb-2"></p>
+                    <canvas id="pdf-canvas-preview" class="w-full border border-dashed border-gray-400 rounded"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden A4-sized div for rendering content -->
+    <div id="a4-content-wrapper"></div>
+    <!-- Toast Notification Element -->
+    <div id="toast-notification"></div>
+    <!-- MODALS -->
+    <div id="product-modal" class="modal"><div class="modal-content"><div class="flex justify-between items-center mb-4"><h2 id="modal-product-title" class="text-2xl font-bold"></h2><span class="close-button" id="close-product-modal-btn">×</span></div><div class="flex justify-start mb-4 border-b pb-4 gap-2 flex-wrap"><button id="import-excel-btn" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 w-auto"></button><button id="export-excel-btn" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 w-auto"></button><button id="backup-data-btn" class="px-4 py-2 bg-teal-600 text-white rounded hover:bg-teal-700 w-auto"></button><button id="restore-data-btn" class="px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600 w-auto"></button><input type="file" id="excel-importer" class="hidden" accept=".xlsx, .xls"><input type="file" id="json-importer" class="hidden" accept=".json"></div><form id="product-form" class="mb-6 bg-gray-100 p-4 rounded-lg"><input type="hidden" id="edit-index" value="-1"><div class="grid grid-cols-1 md:grid-cols-3 gap-4"><div><label id="label-modal-name" class="block font-medium"></label><input type="text" id="product-name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required></div><div><label id="label-modal-unit" class="block font-medium"></label><input type="text" id="product-unit" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required></div><div><label id="label-modal-price" class="block font-medium"></label><input type="number" id="product-price" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required step="any"></div></div><div class="mt-4 flex justify-end"><button id="btn-modal-save" type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 w-auto"></button><button id="cancel-edit-btn" type="button" class="ml-2 px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 w-auto" style="display: none;"></button></div></form><div class="overflow-y-auto max-h-64"><table class="w-full"><thead class="bg-gray-200"><tr><th id="th-modal-name" class="p-2 text-left"></th><th id="th-modal-unit" class="p-2 text-center"></th><th id="th-modal-price" class="p-2 text-right"></th><th id="th-modal-action" class="p-2 w-32 text-center"></th></tr></thead><tbody id="product-management-table"></tbody></table></div></div></div>
+    <div id="history-modal" class="modal"><div class="modal-content"><div class="flex justify-between items-center mb-4"><h2 id="modal-history-title" class="text-2xl font-bold"></h2><span class="close-button" id="close-history-modal-btn">×</span></div><div class="overflow-y-auto max-h-96"><table class="w-full"><thead class="bg-gray-200"><tr><th id="th-history-date" class="p-2 text-left"></th><th id="th-history-no" class="p-2 text-left"></th><th id="th-history-customer" class="p-2 text-left"></th><th id="th-history-total" class="p-2 text-right"></th><th id="th-history-action" class="p-2 w-32 text-center"></th></tr></thead><tbody id="history-table-body"></tbody></table></div></div></div>
+    
+    <!-- [CẢI TIẾN] Thay đổi cách gọi script để sử dụng module -->
+    <script type="module" src="main.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,140 @@
+body { 
+    font-family: 'Roboto', sans-serif; 
+    background-color: #f0f2f5; 
+}
+
+#toast-notification { 
+    position: fixed; 
+    top: 20px; 
+    right: 20px; 
+    background-color: #28a745; 
+    color: white; 
+    padding: 16px; 
+    border-radius: 8px; 
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15); 
+    z-index: 1050; 
+    opacity: 0; 
+    visibility: hidden; 
+    transform: translateY(-20px); 
+    transition: all 0.3s ease-in-out; 
+}
+#toast-notification.show { 
+    opacity: 1; 
+    visibility: visible; 
+    transform: translateY(0); 
+}
+#toast-notification.error { background-color: #dc3545; }
+#toast-notification.info { background-color: #17a2b8; }
+
+#a4-content-wrapper { 
+    position: absolute; 
+    left: -9999px; 
+    top: 0; 
+    background: white; 
+    width: 210mm; 
+    min-height: 297mm; 
+    padding: 15mm; 
+    box-sizing: border-box; 
+    font-size: 11pt; 
+    color: #333; 
+}
+
+.modal { 
+    display: none; 
+    position: fixed; 
+    z-index: 1000; 
+    left: 0; 
+    top: 0; 
+    width: 100%; 
+    height: 100%; 
+    overflow: auto; 
+    background-color: rgba(0,0,0,0.5); 
+}
+.modal-content { 
+    background-color: #fefefe; 
+    margin: 5vh auto; 
+    padding: 20px; 
+    border: 1px solid #888; 
+    width: 90%; 
+    max-width: 800px; 
+    border-radius: 8px; 
+}
+.close-button { 
+    color: #aaa; 
+    float: right; 
+    font-size: 28px; 
+    font-weight: bold; 
+    cursor: pointer; 
+}
+
+/* [CẢI TIẾN] Thêm class để làm nổi bật input lỗi */
+.input-error {
+    border-color: #dc3545 !important;
+    box-shadow: 0 0 0 1px #dc3545 !important;
+}
+
+
+@media print { 
+    body * { visibility: hidden; } 
+    #a4-content-wrapper, #a4-content-wrapper * { visibility: visible; } 
+    #a4-content-wrapper { 
+        position: absolute; 
+        left: 0; 
+        top: 0; 
+        margin: 0; 
+        padding: 15mm; 
+        border: none; 
+        box-shadow: none; 
+        width: 210mm; 
+        height: 297mm; 
+    } 
+}
+/* [CẢI TIẾN] CSS cho các picker tính toán tự động */
+.calculation-picker {
+    display: none; /* Mặc định ẩn đi */
+    gap: 8px;
+    margin-top: 8px;
+    align-items: center;
+    flex-wrap: wrap; /* Cho phép xuống dòng nếu không đủ chỗ */
+}
+
+.calculation-picker.visible {
+    display: flex; /* Hiện ra khi cần */
+}
+
+.calculation-picker label {
+    font-size: 0.8rem;
+    color: #555;
+    white-space: nowrap;
+}
+
+/* Style chung cho các input picker */
+.calculation-picker input {
+    padding: 4px 6px;
+    font-size: 0.9rem;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    background-color: white;
+    cursor: pointer;
+}
+/* [CẢI TIẾN] Tùy chỉnh dấu đầu dòng cho danh sách */
+.custom-list {
+    list-style: none; /* Bỏ dấu đầu dòng mặc định */
+    padding-left: 0;
+}
+
+.custom-list li {
+    padding-left: 1.5em; /* Tạo khoảng trống cho icon */
+    position: relative;
+}
+
+/* [SỬA LỖI] Dùng ký tự Unicode thay cho SVG để tương thích với html2canvas */
+.custom-list li::before {
+    content: '✓'; /* Sử dụng ký tự dấu tick Unicode */
+    position: absolute;
+    left: 0;
+    top: 0.1em; /* Điều chỉnh lại vị trí dọc */
+    color: #28a745; /* Màu xanh của dấu tick */
+    font-weight: bold;
+    font-size: 1.2em; /* Tăng kích thước một chút cho đẹp */
+}
